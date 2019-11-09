@@ -34,7 +34,7 @@ void wm8731_startDacDma(struct wm8731_dev_s *self)
   }
 }
 
-void wm8731_putOutBuf(struct wm8731_dev_s *self, uint16_t *data)
+void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data)
 {
     wm8731_outBufAvail=0;
     uint16_t offset=wm8731_nextOutBuf*(256);
