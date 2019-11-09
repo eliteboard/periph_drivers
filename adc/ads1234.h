@@ -1,0 +1,1 @@
+/* Driver for ADC ADS1234 */
