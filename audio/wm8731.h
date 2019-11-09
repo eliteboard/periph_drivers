@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include "i2c_hal.h"
+#include "main.h"
 
 /* Register addresses */
 #define WM8731_LEFT_LINE_IN_ADR (0x0)
@@ -95,9 +96,18 @@
 #define WM8731_RESET_BIT_NUM (0u)
 #define WM8731_RESET_MASK (0b111111111)
 
+#define WM8731_DAC_BUF_LEN 512 //total length, half of it is used for double buffering
+#define WM8731_ADC_BUF_LEN 512
+#define DMA_BUFFER \
+    __attribute__((section(".dma_buffer"))) __attribute__ ((aligned (4)))
+DMA_BUFFER static int16_t wm8731_dacBuf[WM8731_DAC_BUF_LEN];
+// DMA_BUFFER static int16_t wm8731_adcBuf[WM8731_ADC_BUF_LEN];
+
 struct wm8731_dev_s
 {
     struct i2c_dev_s *i2c_dev; /**< I2C device */
+    SAI_HandleTypeDef *sai_dev_dac;
+    SAI_HandleTypeDef *sai_dev_adc;
     //struct sai_dev_s *sai_dev; /**< SAI device */
     uint8_t hw_adr; /**< hardware address of chip */
     uint16_t reg[16]; /**<  */
@@ -115,5 +125,9 @@ int8_t wm8731_set_sampling_rate(struct wm8731_dev_s *self, enum wm8731_sr sr);
 int8_t wm8731_conf_linein(struct wm8731_dev_s *self, float_t volume_db);
 int8_t wm8731_activate(struct wm8731_dev_s *self);
 int8_t wm8731_init(struct wm8731_dev_s *self);
+
+void wm8731_waitOutBuf(struct wm8731_dev_s *self);
+void wm8731_startDacDma(struct wm8731_dev_s *self);
+void wm8731_putOutBuf(struct wm8731_dev_s *self, uint16_t *data);
 
 #endif

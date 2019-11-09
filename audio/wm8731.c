@@ -1,6 +1,49 @@
 /* Driver for audio codec WM8731 */
 #include "wm8731.h"
 #include <errno.h>
+#include <memory.h>
+
+static volatile uint8_t wm8731_nextOutBuf=0, wm8731_outBufAvail=0;
+
+void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
+{
+    //if(hsai==hsai_BlockB1)
+    wm8731_nextOutBuf=1;
+    wm8731_outBufAvail=1;
+}
+
+void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
+{
+    wm8731_nextOutBuf=0;
+    wm8731_outBufAvail=1;
+}
+
+void wm8731_waitOutBuf(struct wm8731_dev_s *self)
+{
+    while(!wm8731_outBufAvail)
+    {
+        HAL_GPIO_TogglePin(SEGA_GPIO_Port, SEGA_Pin);
+    }    
+}
+
+void wm8731_startDacDma(struct wm8731_dev_s *self)
+{  
+  if (HAL_SAI_Transmit_DMA(self->sai_dev_dac, (uint8_t*)wm8731_dacBuf, WM8731_DAC_BUF_LEN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+void wm8731_putOutBuf(struct wm8731_dev_s *self, uint16_t *data)
+{
+    wm8731_outBufAvail=0;
+    uint16_t offset=wm8731_nextOutBuf*(256);
+    void *adr_dest;
+    adr_dest=(void*) (&wm8731_dacBuf[offset]);
+    memcpy(adr_dest, data, WM8731_DAC_BUF_LEN);
+    __DSB(); //wait for end of data transfer   
+
+}
 
 int8_t wm8731_writeReg(struct wm8731_dev_s *self, uint8_t regadr, uint16_t val)
 {
