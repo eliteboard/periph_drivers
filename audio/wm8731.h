@@ -101,7 +101,7 @@
 #define DMA_BUFFER \
     __attribute__((section(".dma_buffer"))) __attribute__ ((aligned (4)))
 DMA_BUFFER static int16_t wm8731_dacBuf[WM8731_DAC_BUF_LEN];
-// DMA_BUFFER static int16_t wm8731_adcBuf[WM8731_ADC_BUF_LEN];
+DMA_BUFFER static int16_t wm8731_adcBuf[WM8731_ADC_BUF_LEN];
 
 struct wm8731_dev_s
 {
@@ -129,5 +129,6 @@ int8_t wm8731_init(struct wm8731_dev_s *self);
 void wm8731_waitOutBuf(struct wm8731_dev_s *self);
 void wm8731_startDacDma(struct wm8731_dev_s *self);
 void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data);
+void wm8731_getInBuf(struct wm8731_dev_s *self, int16_t *data);
 
 #endif

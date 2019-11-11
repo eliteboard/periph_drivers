@@ -3,19 +3,35 @@
 #include <errno.h>
 #include <memory.h>
 
-static volatile uint8_t wm8731_nextOutBuf=0, wm8731_outBufAvail=0;
+static volatile uint8_t wm8731_nextOutBuf=0,
+                        wm8731_outBufAvail=0,
+                        wm8731_nextInBuf=0,
+                        wm8731_inBufAvail=0;
+
+static struct wm8731_dev_s *wm8731_devGlob=0; //required for ISR/Callback fct.
 
 void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 {
-    //if(hsai==hsai_BlockB1)
     wm8731_nextOutBuf=1;
     wm8731_outBufAvail=1;
+}
+
+void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
+{
+    wm8731_nextInBuf=1;
+    wm8731_inBufAvail=1;
 }
 
 void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
 {
     wm8731_nextOutBuf=0;
     wm8731_outBufAvail=1;
+}
+
+void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef *hsai)
+{
+    wm8731_nextInBuf=0;
+    wm8731_inBufAvail=1;
 }
 
 void wm8731_waitOutBuf(struct wm8731_dev_s *self)
@@ -26,9 +42,24 @@ void wm8731_waitOutBuf(struct wm8731_dev_s *self)
     }    
 }
 
+void wm8731_waitInBuf(struct wm8731_dev_s *self)
+{
+    while(!wm8731_inBufAvail)
+    {
+    }    
+}
+
 void wm8731_startDacDma(struct wm8731_dev_s *self)
 {  
   if (HAL_SAI_Transmit_DMA(self->sai_dev_dac, (uint8_t*)wm8731_dacBuf, WM8731_DAC_BUF_LEN) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+void wm8731_startAdcDma(struct wm8731_dev_s *self)
+{  
+  if (HAL_SAI_Receive_DMA(self->sai_dev_adc, (uint8_t*)wm8731_adcBuf, WM8731_ADC_BUF_LEN) != HAL_OK)
   {
     Error_Handler();
   }
@@ -41,8 +72,17 @@ void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data)
     void *adr_dest;
     adr_dest=(void*) (&wm8731_dacBuf[offset]);
     memcpy(adr_dest, data, WM8731_DAC_BUF_LEN);
-    __DSB(); //wait for end of data transfer   
+    __DSB(); //wait for end of data transfer
+}
 
+void wm8731_getInBuf(struct wm8731_dev_s *self, int16_t *data)
+{
+    wm8731_inBufAvail=0;
+    uint16_t offset=wm8731_nextInBuf*(256);
+    void *adr_src;
+    adr_src=(void*) (&wm8731_adcBuf[offset]);
+    memcpy(data, adr_src, WM8731_ADC_BUF_LEN);
+    __DSB(); //wait for end of data transfer
 }
 
 int8_t wm8731_writeReg(struct wm8731_dev_s *self, uint8_t regadr, uint16_t val)
@@ -257,5 +297,6 @@ int8_t wm8731_init(struct wm8731_dev_s *self)
     error+=wm8731_conf_linein(self, 0);
     error+=wm8731_conf_digital_path(self);
     error+=wm8731_activate(self);
+    wm8731_devGlob=self;
     return error;
 }
