@@ -127,7 +127,9 @@ int8_t wm8731_activate(struct wm8731_dev_s *self);
 int8_t wm8731_init(struct wm8731_dev_s *self);
 
 void wm8731_waitOutBuf(struct wm8731_dev_s *self);
+void wm8731_waitInBuf(struct wm8731_dev_s *self);
 void wm8731_startDacDma(struct wm8731_dev_s *self);
+void wm8731_startAdcDma(struct wm8731_dev_s *self);
 void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data);
 void wm8731_getInBuf(struct wm8731_dev_s *self, int16_t *data);
 
