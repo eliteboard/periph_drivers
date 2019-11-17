@@ -3,34 +3,34 @@
 #include <errno.h>
 #include <memory.h>
 
-static volatile uint8_t wm8731_nextOutBuf=0,
-                        wm8731_outBufAvail=0,
-                        wm8731_nextInBuf=0,
-                        wm8731_inBufAvail=0;
+static volatile uint8_t wm8731_nextOutBuf=0, //next available half of output buffer (0 or 1)
+                        wm8731_outBufAvail=0, //0 while waiting for next interrupt
+                        wm8731_nextInBuf=0, //next available half of input buffer (0 or 1)
+                        wm8731_inBufAvail=0; //0 while waiting for next interrupt
 
 static struct wm8731_dev_s *wm8731_devGlob=0; //required for ISR/Callback fct.
 
 void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 {
-    wm8731_nextOutBuf=1;
+    wm8731_nextOutBuf=0;
     wm8731_outBufAvail=1;
 }
 
 void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 {
-    wm8731_nextInBuf=1;
+    wm8731_nextInBuf=0;
     wm8731_inBufAvail=1;
 }
 
 void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
 {
-    wm8731_nextOutBuf=0;
+    wm8731_nextOutBuf=1;
     wm8731_outBufAvail=1;
 }
 
 void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef *hsai)
 {
-    wm8731_nextInBuf=0;
+    wm8731_nextInBuf=1;
     wm8731_inBufAvail=1;
 }
 
@@ -68,7 +68,7 @@ void wm8731_startAdcDma(struct wm8731_dev_s *self)
 void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data)
 {
     wm8731_outBufAvail=0;
-    uint16_t offset=wm8731_nextOutBuf*(256);
+    uint16_t offset=wm8731_nextOutBuf*(WM8731_ADC_BUF_LEN/2);
     void *adr_dest;
     adr_dest=(void*) (&wm8731_dacBuf[offset]);
     memcpy(adr_dest, data, WM8731_DAC_BUF_LEN);
@@ -78,7 +78,7 @@ void wm8731_putOutBuf(struct wm8731_dev_s *self, int16_t *data)
 void wm8731_getInBuf(struct wm8731_dev_s *self, int16_t *data)
 {
     wm8731_inBufAvail=0;
-    uint16_t offset=wm8731_nextInBuf*(256);
+    uint16_t offset=wm8731_nextInBuf*(WM8731_ADC_BUF_LEN/2);
     void *adr_src;
     adr_src=(void*) (&wm8731_adcBuf[offset]);
     memcpy(data, adr_src, WM8731_ADC_BUF_LEN);
@@ -134,9 +134,11 @@ int8_t wm8731_set_interface_format(struct wm8731_dev_s *self)
     //16bit, DSP Mode: MSB on 1st BCLK, WM8731 is master
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] = 0u;
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] &= ~(1<<WM8731_BCLKINV_BIT_NUM); //0: clk not inverted
+    // self->reg[WM8731_DIG_INTERFACE_FMT_ADR] |= (1<<WM8731_BCLKINV_BIT_NUM); //1: clk inverted
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] |= (1<<WM8731_MS_BIT_NUM); //1: WM8731 is master
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] &= ~(1<<WM8731_LRSWAP_BIT_NUM); //0: L/R not swapped
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] &= ~(1<<WM8731_LRP_BIT_NUM); //0: MSB is available on 1st BCLK rising edge after DACLRC rising edge
+    // self->reg[WM8731_DIG_INTERFACE_FMT_ADR] |= (1<<WM8731_LRP_BIT_NUM); //1: MSB is available on 2nd BCLK rising edge after DACLRC rising edge
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] &= ~(WM8731_IWL_MASK); //all 0: 16 bits
     self->reg[WM8731_DIG_INTERFACE_FMT_ADR] |= (WM8731_FORMAT_MASK); //all 1: DSP Mode, frame sync + 2 data packed word
     error+=wm8731_writeReg(self, WM8731_DIG_INTERFACE_FMT_ADR, self->reg[WM8731_DIG_INTERFACE_FMT_ADR]);

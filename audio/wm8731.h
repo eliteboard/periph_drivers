@@ -96,8 +96,8 @@
 #define WM8731_RESET_BIT_NUM (0u)
 #define WM8731_RESET_MASK (0b111111111)
 
-#define WM8731_DAC_BUF_LEN 512 //total length, half of it is used for double buffering
-#define WM8731_ADC_BUF_LEN 512
+#define WM8731_DAC_BUF_LEN 512 //total length (words), half of it is used for double buffering
+#define WM8731_ADC_BUF_LEN 512 //total length (words), half of it is used for double buffering
 #define DMA_BUFFER \
     __attribute__((section(".dma_buffer"))) __attribute__ ((aligned (4)))
 DMA_BUFFER static int16_t wm8731_dacBuf[WM8731_DAC_BUF_LEN];
