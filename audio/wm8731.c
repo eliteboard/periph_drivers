@@ -38,7 +38,6 @@ void wm8731_waitOutBuf(struct wm8731_dev_s *self)
 {
     while(!wm8731_outBufAvail)
     {
-        HAL_GPIO_TogglePin(SEGA_GPIO_Port, SEGA_Pin);
     }    
 }
 
