@@ -287,13 +287,13 @@ int8_t wm8731_activate(struct wm8731_dev_s *self)
     }
 }
 
-int8_t wm8731_init(struct wm8731_dev_s *self)
+int8_t wm8731_init(struct wm8731_dev_s *self, enum wm8731_sr sr)
 {
     int8_t error=0;
     error+=wm8731_reset(self);
     error+=wm8731_disable_power_down(self);
     error+=wm8731_set_interface_format(self);
-    error+=wm8731_set_sampling_rate(self, ADC48_DAC48);
+    error+=wm8731_set_sampling_rate(self, sr);
     error+=wm8731_conf_analog_path(self);
     error+=wm8731_conf_linein(self, 0);
     error+=wm8731_conf_digital_path(self);

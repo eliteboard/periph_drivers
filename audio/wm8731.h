@@ -124,7 +124,7 @@ int8_t wm8731_set_interface_format(struct wm8731_dev_s *self);
 int8_t wm8731_set_sampling_rate(struct wm8731_dev_s *self, enum wm8731_sr sr);
 int8_t wm8731_conf_linein(struct wm8731_dev_s *self, float_t volume_db);
 int8_t wm8731_activate(struct wm8731_dev_s *self);
-int8_t wm8731_init(struct wm8731_dev_s *self);
+int8_t wm8731_init(struct wm8731_dev_s *self, enum wm8731_sr sr);
 
 void wm8731_waitOutBuf(struct wm8731_dev_s *self);
 void wm8731_waitInBuf(struct wm8731_dev_s *self);
