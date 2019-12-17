@@ -227,7 +227,7 @@ int8_t wm8731_conf_digital_path(struct wm8731_dev_s *self)
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_HPOR_BIT_NUM); //0: clear dc offset when highpass enabled
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_DACMU_BIT_NUM); //0: disable DAC mute
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(WM8731_DEEMPH_MASK); //00: disable de-emphasis control
-    self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] |=  (1<<WM8731_ADCHPD_BIT_NUM); //1: disable ADC highpass filter 
+    self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_ADCHPD_BIT_NUM); //0: enable ADC highpass filter
 
     error+=wm8731_writeReg(self, WM8731_DIG_AUDIO_PATH_CTRL_ADR, self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR]);
 
