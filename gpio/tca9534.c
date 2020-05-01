@@ -1,4 +1,4 @@
-/* Driver for programmable DC/DC converter TCA9534 */
+/* Driver for I/O expander TCA9534 */
 #include "tca9534.h"
 #include <errno.h>
 #include <math.h>

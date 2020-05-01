@@ -1,4 +1,4 @@
-/* Driver for programmable DC/DC converter TCA9534 */
+/* Driver for I/O expander TCA9534 */
 #ifndef TCA9534_H
 #define TCA9534_H
 
@@ -16,6 +16,8 @@ struct tca9534_dev_s
     struct i2c_dev_s *i2c_dev; /**< I2C device */
     uint8_t hw_adr; /**<  */
     //uint8_t reg0; /**<  */
+
+    // TODO: Add function pointers
 };
 
 int8_t tca9534_writeReg(struct tca9534_dev_s *self, uint8_t adr, uint8_t val);
