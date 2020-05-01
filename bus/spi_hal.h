@@ -7,9 +7,9 @@
 struct spi_dev_s
 {    
     SPI_HandleTypeDef *hspi;
-    int8_t (*spi_transmit) (struct spi_dev_s *self,
+    int8_t (*transmit) (struct spi_dev_s *self,
                                    uint8_t *pData, uint16_t Size, uint32_t Timeout);
-    int8_t (*spi_transmitReceive) (struct spi_dev_s *self, uint8_t *pTxData,
+    int8_t (*transmitReceive) (struct spi_dev_s *self, uint8_t *pTxData,
                                     uint8_t *pRxData, uint16_t Size, uint32_t Timeout);
     //TODO: consider using a vtable
 };

@@ -13,7 +13,7 @@ int8_t lis3mdl_writeReg(struct lis3mdl_dev_s *self, uint8_t regadr, uint16_t val
 
 int8_t lis3mdl_readReg(struct lis3mdl_dev_s *self, uint8_t adr, uint8_t *val)
 {
-    return self->i2c_dev->i2c_mem_read(self->i2c_dev, self->hw_adr, adr, 1, val, 1, 0xFFFFFFFF);
+    return self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr, adr, 1, val, 1, 0xFFFFFFFF);
 }
 
 int8_t lis3mdl_whoami(struct lis3mdl_dev_s *self)

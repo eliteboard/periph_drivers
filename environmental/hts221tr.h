@@ -35,11 +35,14 @@ struct ht221tr_dev_s
     //struct sai_dev_s *sai_dev; /**< SAI device */
     uint8_t hw_adr; /**< hardware address of chip */
     //uint16_t reg[16]; /**<  */
+
+    // TODO: Add function pointers
 };
 
 int8_t ht221tr_writeReg(struct ht221tr_dev_s *self, uint8_t adr, uint16_t val);
 int8_t ht221tr_readReg(struct ht221tr_dev_s *self, uint8_t adr, uint8_t *val);
 
 int8_t ht221tr_whoami(struct ht221tr_dev_s *self);
+int8_t ht221tr_init(struct ht221tr_dev_s *self);
 
 #endif

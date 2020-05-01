@@ -38,6 +38,8 @@ struct lt3582_dev_s
     uint8_t reg1; /**< VOUTN Output Voltage (00h=1.2V, FFh = 13.95V) */
     uint8_t reg2; /**< Lockout bit, 25mV increase Voutp, RAMP pull-up current, power down discharge EN, power up sequencing */
     uint8_t cmdr; /**< write OTP, clr/progr fault, RST, switches off, REG select (OTP or REG) */
+
+    // TODO: Add function pointers
 };
 
 int8_t lt3582_writeReg(struct lt3582_dev_s *self, uint8_t adr, uint8_t val);

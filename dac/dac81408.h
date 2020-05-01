@@ -34,7 +34,8 @@
 
 struct dac81408_dev_s
 {
-    struct spi_dev_s *spi_dev; /**< SPI device */    
+    struct spi_dev_s *spi_dev; /**< SPI device */
+    // TODO: Add function pointers
 };
 
 enum dac81408_range
