@@ -227,7 +227,7 @@ int8_t wm8731_conf_digital_path(struct wm8731_dev_s *self)
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_HPOR_BIT_NUM); //0: clear dc offset when highpass enabled
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_DACMU_BIT_NUM); //0: disable DAC mute
     self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(WM8731_DEEMPH_MASK); //00: disable de-emphasis control
-    self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] |=  (1<<WM8731_ADCHPD_BIT_NUM); //1: disable ADC highpass filter 
+    self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR] &= ~(1<<WM8731_ADCHPD_BIT_NUM); //0: enable ADC highpass filter
 
     error+=wm8731_writeReg(self, WM8731_DIG_AUDIO_PATH_CTRL_ADR, self->reg[WM8731_DIG_AUDIO_PATH_CTRL_ADR]);
 
@@ -287,13 +287,13 @@ int8_t wm8731_activate(struct wm8731_dev_s *self)
     }
 }
 
-int8_t wm8731_init(struct wm8731_dev_s *self)
+int8_t wm8731_init(struct wm8731_dev_s *self, enum wm8731_sr sr)
 {
     int8_t error=0;
     error+=wm8731_reset(self);
     error+=wm8731_disable_power_down(self);
     error+=wm8731_set_interface_format(self);
-    error+=wm8731_set_sampling_rate(self, ADC48_DAC48);
+    error+=wm8731_set_sampling_rate(self, sr);
     error+=wm8731_conf_analog_path(self);
     error+=wm8731_conf_linein(self, 0);
     error+=wm8731_conf_digital_path(self);
