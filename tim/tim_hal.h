@@ -14,9 +14,6 @@ struct tim_dev_s
     //TODO: consider using a vtable
 };
 
-int8_t tim_set_prescaler(struct tim_dev_s *self, uint16_t Prescaler);
-int8_t tim_set_period(struct tim_dev_s *self, uint16_t Period);
-int8_t tim_start(struct tim_dev_s *self);
-int8_t tim_stop(struct tim_dev_s *self);
+void tim_dev_init(struct tim_dev_s *self, TIM_HandleTypeDef *htim);
 
 #endif

@@ -2,13 +2,25 @@
 
 #include "internal_adc.h"
 #include "stm32h7xx_hal.h"
+#include "errno.h"
 
 // the dma-buffer has to be placed in the correct memory region
 #define DMA_BUFFER \
     __attribute__((section(".dma_buffer"))) __attribute__ ((aligned (4)))
 DMA_BUFFER uint32_t int_adc1_dma_buffer[INT_ADC_BUFFER_LENGTH]; //do not use this from the outside
 
+int8_t int_adc_arm(struct int_adc_dev_s *self);
+uint32_t* int_adc_get_data(struct int_adc_dev_s *self);
+
 static struct int_adc_dev_s *int_adc_devGlob=0; //required for ISR/Callback fct. works only for one instance!
+
+
+void int_adc_dev_init(struct int_adc_dev_s *self, struct tim_dev_s *tim_dev, ADC_HandleTypeDef *hadc)
+{
+    self->hadc = hadc;
+    self->arm = &int_adc_arm;
+    self->get_data = &int_adc_get_data;
+}
 
 int8_t int_adc_arm(struct int_adc_dev_s *self)
 {
@@ -19,8 +31,12 @@ int8_t int_adc_arm(struct int_adc_dev_s *self)
     if(HAL_ADC_Start_DMA(self->hadc, &int_adc1_dma_buffer[0], INT_ADC_BUFFER_LENGTH) != HAL_OK)
     {
         /* Start Error */
-        Error_Handler();
+        //Error_Handler();
+        return -1;
     }
+    //TODO: check for errors
+    errno = 0;
+    return 0;
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)

@@ -3,6 +3,7 @@
 #include "internal_dac.h"
 #include "stm32h7xx_hal.h"
 #include "memory.h"
+#include "errno.h"
 
 #include "main.h" //for LED definitions
 
@@ -12,15 +13,33 @@
 DMA_BUFFER uint32_t int_dac1_dma_buffer[INT_DAC_BUFFER_LENGTH]; //do not use this from the outside
 // DMA_BUFFER uint16_t int_dac2_dma_buffer[INT_DAC_BUFFER_LENGTH];
 
+int8_t int_dac_set_sample(struct int_dac_dev_s *self, uint16_t val, uint16_t idx);
+int8_t int_dac_fill_buf(struct int_dac_dev_s *self, uint16_t *data);
+int8_t int_dac_arm(struct int_dac_dev_s *self);
+
+void int_dac_dev_init(struct int_dac_dev_s *self, struct tim_dev_s *tim_dev, DAC_HandleTypeDef *hdac)
+{
+    self->hdac = hdac;
+    self->set_sample = &int_dac_set_sample;
+    self->fill_buf = &int_dac_fill_buf;
+    self->arm = &int_dac_arm;
+}
+
 int8_t int_dac_set_sample(struct int_dac_dev_s *self, uint16_t val, uint16_t idx)
 {
     if(idx<INT_DAC_BUFFER_LENGTH)
         int_dac1_dma_buffer[idx]=val;
+    //TODO: check for errors
+    errno = 0;
+    return 0;
 }
 
 int8_t int_dac_fill_buf(struct int_dac_dev_s *self, uint16_t *data)
 {     
     memcpy(int_dac1_dma_buffer, data, INT_DAC_BUFFER_LENGTH*sizeof(int_dac1_dma_buffer[0]));
+    //TODO: check for errors
+    errno = 0;
+    return 0;
 }
 
 int8_t int_dac_arm(struct int_dac_dev_s *self)
@@ -37,6 +56,9 @@ int8_t int_dac_arm(struct int_dac_dev_s *self)
     //     /* Start Error */
     //     Error_Handler();
     // }
+    //TODO: check for errors
+    errno = 0;
+    return 0;
 }
 
 

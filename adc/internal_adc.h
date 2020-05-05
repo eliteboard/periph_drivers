@@ -18,7 +18,6 @@ struct int_adc_dev_s
     //TODO: consider using a vtable
 };
 
-int8_t int_adc_arm(struct int_adc_dev_s *self);
-uint32_t* int_adc_get_data(struct int_adc_dev_s *self);
+void int_adc_dev_init(struct int_adc_dev_s *self, struct tim_dev_s *tim_dev, ADC_HandleTypeDef *hadc);
 
 #endif

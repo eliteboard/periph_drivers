@@ -14,14 +14,11 @@ struct int_dac_dev_s
     DAC_HandleTypeDef *hdac;
     struct tim_dev_s *tim_dev;
     int8_t (*set_sample) (struct int_dac_dev_s *self, uint16_t val, uint16_t idx);
-    int8_t (*fill_buf) (struct int_dac_dev_s *self);
+    int8_t (*fill_buf) (struct int_dac_dev_s *self, uint16_t *data);
     int8_t (*arm) (struct int_dac_dev_s *self);
     //TODO: consider using a vtable
 };
 
-int8_t int_dac_set_sample(struct int_dac_dev_s *self, uint16_t val, uint16_t idx);
-int8_t int_dac_fill_buf(struct int_dac_dev_s *self, uint16_t *data);
-int8_t int_dac_arm(struct int_dac_dev_s *self);
-
+void int_dac_dev_init(struct int_dac_dev_s *self, struct tim_dev_s *tim_dev, DAC_HandleTypeDef *hdac);
 
 #endif
