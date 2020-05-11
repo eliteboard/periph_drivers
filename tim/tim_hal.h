@@ -9,6 +9,7 @@ struct tim_dev_s
     TIM_HandleTypeDef *htim;
     int8_t (*set_prescaler) (struct tim_dev_s *self, uint16_t Prescaler);
     int8_t (*set_period) (struct tim_dev_s *self, uint16_t Period);
+    int8_t (*set_freq) (struct tim_dev_s *self, uint32_t Freq);
     int8_t (*start) (struct tim_dev_s *self);
     int8_t (*stop) (struct tim_dev_s *self);
     //TODO: consider using a vtable
