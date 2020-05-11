@@ -6,15 +6,17 @@
 #include <stdint.h>
 #include "stm32h7xx_hal.h"
 
-#define INT_ADC_BUFFER_LENGTH (4096)
+#define INT_ADC_MAX_BUFFER_LENGTH (4096)
 
 struct int_adc_dev_s
 {    
     ADC_HandleTypeDef *hadc;
     struct tim_dev_s *tim_dev;
+    int8_t (*set_nsamp) (struct int_adc_dev_s *self, uint16_t nsamp);
     int8_t (*arm) (struct int_adc_dev_s *self);  //arms ADC
     uint32_t* (*get_data) (struct int_adc_dev_s *self); //returns pointer to sampled data
     uint8_t data_avail; //flag showing availability of data (conversion done)
+    int16_t nsamp;
     //TODO: consider using a vtable
 };
 
