@@ -15,7 +15,7 @@
 #define ISL28023_H_
 
 #include "main.h"
-
+#include "i2c_hal.h"
 
 /* Device register definition -------------------------------------------------------*/
 // device info
@@ -155,7 +155,7 @@ typedef struct WS_DPM
 
 
 /* Function prototype definition -------------------------------------------------------*/
-void dpm_init(void);
+void dpm_init(struct i2c_dev_s *i2c_dev);
 void dpm_service(void);
 DPM_STAT dpm_write(uint8_t devAddr, uint8_t regAddr, uint8_t *pData, uint8_t size);
 DPM_STAT dpm_writeBuf(uint8_t devAddr, uint8_t regAddr, uint8_t *pData, uint8_t size);

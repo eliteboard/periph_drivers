@@ -12,17 +12,18 @@
   ******************************************************************************
   */
 
-#include "ISL28023.h"
-#include "Stm_Platform.h"
+#include "isl28023.h"
+#include "i2c_hal.h"
+//#include "Stm_Platform.h"
 
 WS_DPM WsDpm;
 
 /**
   * @brief Initialization of I2C handle
   */
-void dpm_init(void)
+void dpm_init(struct i2c_dev_s *i2c_dev)
 {
-	WsDpm.DpmI2cHandle = &hi2c1;				/* DPM I2C handle = SMBUS2 handle */
+	WsDpm.DpmI2cHandle = i2c_dev->hi2c;		/* DPM I2C handle = SMBUS2 handle */
 	WsDpm.Tx.bufRp = 0;						/* init tx buffer */
 	WsDpm.Tx.bufWp = 0;
 	WsDpm.Tx.bufUsed = 0;
