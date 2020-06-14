@@ -100,12 +100,15 @@ struct isl28023_dev_s
     struct i2c_dev_s *i2c_dev; /**< I2C device */
 	int8_t (*read_ID) ();
 	int8_t (*read_vshunt) ();
+	int8_t (*read_vout) ();
+	int8_t (*read_iout) ();
+	float_t vshunt_lsb, vbus_lsb, current_lsb;
     uint8_t hw_adr; /**< hardware address of chip */
     uint16_t reg[16]; /**<  */
     //TODO: consider using a vtable
 };
 
-void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr);
+void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr, float_t R_shunt);
 
 /* Communication buffer definition -------------------------------------------------------*/
 #define DPM_TX_BUFFER_LEN		128

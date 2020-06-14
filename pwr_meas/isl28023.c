@@ -17,12 +17,22 @@
 
 int8_t isl28023_read_ID(struct isl28023_dev_s *self, uint8_t *buf);
 int8_t isl28023_read_vshunt(struct isl28023_dev_s *self, float_t *data);
+int8_t isl28023_read_vout(struct isl28023_dev_s *self, float_t *data);
+int8_t isl28023_read_iout(struct isl28023_dev_s *self, float_t *data);
 
-void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr)
+void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr, float_t R_shunt)
 {
     self->i2c_dev = i2c_dev;
 	self->read_ID = &isl28023_read_ID;
 	self->read_vshunt = &isl28023_read_vshunt;
+	self->read_vout = &isl28023_read_vout;
+	self->read_iout = &isl28023_read_iout;
+	float_t ADC_res = (float_t)(1<<15);  // datasheet p. 33
+	float_t vshunt_FS = 80e-3;  // datasheet p. 33
+	float_t current_FS = vshunt_FS/R_shunt;  // datasheet p. 33
+	self->current_lsb = current_FS/ADC_res;  // datasheet p. 33
+	self->vshunt_lsb = 2.5e-6; //2.5uV: datasheet p. 35
+	self->vbus_lsb = 1e-3; //1mV because we use the 60V version of the chip
 	self->hw_adr = hw_adr;
 }
 
@@ -38,13 +48,34 @@ int8_t isl28023_read_vshunt(struct isl28023_dev_s *self, float_t *data)
 	uint8_t buf[3];
 	int8_t error = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
 								   ISL28023_REG_READ_VSHUNT_OUT, I2C_MEMADD_SIZE_8BIT, &buf[0], 3, HAL_MAX_DELAY);
-	float_t vshunt_lsb = 2.5e-6; //2.5uV
 	int16_t sign = (buf[1] & 0b10000000)>>7;  //sign bit
 	int16_t reg_val = ((buf[1] & 0b01111111)<<8) + buf[2] - (sign*(1<<15));  // integer result
-	*data = reg_val * vshunt_lsb;  // final result
+	*data = reg_val * self->vshunt_lsb;  // final result
 	return error;
 }
 
+int8_t isl28023_read_vout(struct isl28023_dev_s *self, float_t *data)
+{
+	// datasheet p. 35
+	uint8_t buf[3];
+	int8_t error = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
+								   ISL28023_REG_READ_VOUT, I2C_MEMADD_SIZE_8BIT, &buf[0], 3, HAL_MAX_DELAY);
+	int16_t reg_val = ((buf[1])<<8) + buf[2];  // integer result
+	*data = reg_val * self->vbus_lsb;  // final result
+	return error;
+}
+
+int8_t isl28023_read_iout(struct isl28023_dev_s *self, float_t *data)
+{
+	// datasheet p. 35
+	uint8_t buf[3];
+	int8_t error = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
+								   ISL28023_REG_READ_IOUT, I2C_MEMADD_SIZE_8BIT, &buf[0], 3, HAL_MAX_DELAY);
+	int16_t sign = (buf[1] & 0b10000000)>>7;  //sign bit
+	int16_t reg_val = ((buf[1] & 0b01111111)<<8) + buf[2] - (sign*(1<<15));  // integer result
+	*data = reg_val * self->current_lsb;  // final result
+	return error;
+}
 WS_DPM WsDpm;
 
 /**
