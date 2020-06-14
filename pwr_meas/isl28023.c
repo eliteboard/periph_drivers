@@ -36,13 +36,13 @@ int8_t isl28023_read_vshunt(struct isl28023_dev_s *self, float_t *data)
 {
 	// datasheet p. 35
 	uint8_t buf[3];
-	int8_t result = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
+	int8_t error = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
 								   ISL28023_REG_READ_VSHUNT_OUT, I2C_MEMADD_SIZE_8BIT, &buf[0], 3, HAL_MAX_DELAY);
 	float_t vshunt_lsb = 2.5e-6; //2.5uV
-	int16_t sign = (buf[1] & 0b10000000)>>7;
-	int16_t reg_val = ((buf[1] & 0b01111111)<<8) + buf[2] - (sign*(1<<15));
-	*data = reg_val * vshunt_lsb;
-	return result;
+	int16_t sign = (buf[1] & 0b10000000)>>7;  //sign bit
+	int16_t reg_val = ((buf[1] & 0b01111111)<<8) + buf[2] - (sign*(1<<15));  // integer result
+	*data = reg_val * vshunt_lsb;  // final result
+	return error;
 }
 
 WS_DPM WsDpm;
