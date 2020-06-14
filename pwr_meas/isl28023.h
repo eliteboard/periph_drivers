@@ -5,7 +5,7 @@
   ******************************************************************************
   * @attention
   *
-  * @author    Alexander Kaineder
+  * @author    Alexander Kaineder, Reinhard Feger
   * @date      Jul 29, 2019
   *
   ******************************************************************************
@@ -19,53 +19,53 @@
 
 /* Device register definition -------------------------------------------------------*/
 // device info
-#define REG_CAPABILITY			0x19
-#define REG_VOUT_MODE			0x20
-#define REG_PMBUS_REV			0x99
-#define REG_IC_DEVICE_ID		0xAD
-#define REG_IC_DEVICE_REV		0xAE
+#define ISL28023_REG_CAPABILITY			0x19
+#define ISL28023_REG_VOUT_MODE			0x20
+#define ISL28023_REG_PMBUS_REV			0x99
+#define ISL28023_REG_IC_DEVICE_ID		0xAD
+#define ISL28023_REG_IC_DEVICE_REV		0xAE
 // global control
-#define REG_RESTORE_DEFAULT		0x12
-#define REG_OPERATEN			0x01
+#define ISL28023_REG_RESTORE_DEFAULT		0x12
+#define ISL28023_REG_OPERATION			0x01
 // channel control
-#define REG_SET_DPM_MODE		0xD2
-#define REG_DPM_CONV_SATUS		0xD3
-#define REG_CONFIG_ICHANNEL		0xD4
-#define REG_IOUT_CAL_GAIN		0x38
-#define REG_CONFIG_VCHANNEL		0xD5
-#define REG_CONFIG_PEAK_DET		0xD7
-#define REG_CONFIG_EXCITATION	0xE2
+#define ISL28023_REG_SET_DPM_MODE		0xD2
+#define ISL28023_REG_DPM_CONV_STATUS		0xD3
+#define ISL28023_REG_CONFIG_ICHANNEL		0xD4
+#define ISL28023_REG_IOUT_CAL_GAIN		0x38
+#define ISL28023_REG_CONFIG_VCHANNEL		0xD5
+#define ISL28023_REG_CONFIG_PEAK_DET		0xD7
+#define ISL28023_REG_CONFIG_EXCITATION	0xE2
 // measurement register
-#define REG_READ_VSHUNT_OUT		0xD6
-#define REG_READ_VOUT			0x8B
-#define REG_READ_IOUT			0x8C
-#define REG_READ_PEAK_MIN_IOUT	0xD8
-#define REG_READ_PEAK_MAX_IOUT 	0xD9
-#define REG_READ_POUT			0x96
-#define REG_READ_VSHUNT_OUT_AUX	0xE0
-#define REG_READ_VOUT_AUX		0xE1
-#define REG_READ_TEMPERATURE_1	0x8D
+#define ISL28023_REG_READ_VSHUNT_OUT		0xD6
+#define ISL28023_REG_READ_VOUT			0x8B
+#define ISL28023_REG_READ_IOUT			0x8C
+#define ISL28023_REG_READ_PEAK_MIN_IOUT	0xD8
+#define ISL28023_REG_READ_PEAK_MAX_IOUT 	0xD9
+#define ISL28023_REG_READ_POUT			0x96
+#define ISL28023_REG_READ_VSHUNT_OUT_AUX	0xE0
+#define ISL28023_REG_READ_VOUT_AUX		0xE1
+#define ISL28023_REG_READ_TEMPERATURE_1	0x8D
 // threshold detector
-#define REG_VOUT_OV_THRES_SET	0xDA
-#define REG_VOUT_UV_THRES_SET	0xDB
-#define REG_IOUT_OC_THRES_SET	0xDC
+#define ISL28023_REG_VOUT_OV_THRES_SET	0xDA
+#define ISL28023_REG_VOUT_UV_THRES_SET	0xDB
+#define ISL28023_REG_IOUT_OC_THRES_SET	0xDC
 // smb alert
-#define REG_CONFIG_INTR			0xDD
-#define REG_FORCE_FEEDTHR_ALERT	0xDE
-#define REG_SMBALERT_MASK		0x1B
-#define REG_SMBALERT2_MASK		0xDF
-#define REG_CLEAR_FAULTS		0x03
-#define REG_STATUS_VOUT			0x7A
-#define REG_STATUS_IOUT			0x7B
-#define REG_STATUS_TEMPERATURE	0x7D
-#define REG_STATUS_CML			0x7E
-#define REG_STATUS_BYTE			0x78
-#define REG_STATUS_WORD			0x79
+#define ISL28023_REG_CONFIG_INTR			0xDD
+#define ISL28023_REG_FORCE_FEEDTHR_ALERT	0xDE
+#define ISL28023_REG_SMBALERT_MASK		0x1B
+#define ISL28023_REG_SMBALERT2_MASK		0xDF
+#define ISL28023_REG_CLEAR_FAULTS		0x03
+#define ISL28023_REG_STATUS_VOUT			0x7A
+#define ISL28023_REG_STATUS_IOUT			0x7B
+#define ISL28023_REG_STATUS_TEMPERATURE	0x7D
+#define ISL28023_REG_STATUS_CML			0x7E
+#define ISL28023_REG_STATUS_BYTE			0x78
+#define ISL28023_REG_STATUS_WORD			0x79
 // voltage margin
-#define REG_CONFIG_VOL_MARGIN	0xE4
-#define REG_SET_VOL_MARGIN		0xE3
+#define ISL28023_REG_CONFIG_VOL_MARGIN	0xE4
+#define ISL28023_REG_SET_VOL_MARGIN		0xE3
 // external clock control
-#define REG_CONFIG_EXT_CLK		0xE5
+#define ISL28023_REG_CONFIG_EXT_CLK		0xE5
 
 /* Register value definition -------------------------------------------------------*/
 // Conversion time in us
@@ -94,6 +94,21 @@
 #define DPM_AUX_CONV			7
 #define DPM_PRI_AVG				3
 #define DPM_PRI_CONV			0
+
+struct isl28023_dev_s
+{    
+    struct i2c_dev_s *i2c_dev; /**< I2C device */
+	int8_t (*read_ID) ();
+    uint8_t hw_adr; /**< hardware address of chip */
+    uint16_t reg[16]; /**<  */
+    //TODO: consider using a vtable
+};
+
+void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr);
+
+
+
+
 
 /* Communication buffer definition -------------------------------------------------------*/
 #define DPM_TX_BUFFER_LEN		128

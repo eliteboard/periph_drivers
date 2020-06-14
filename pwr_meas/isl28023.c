@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * @author    Alexander Kaineder
+  * @author    Alexander Kaineder, Reinhard Feger
   * @date      Jul 29, 2019
   *
   ******************************************************************************
@@ -14,7 +14,27 @@
 
 #include "isl28023.h"
 #include "i2c_hal.h"
-//#include "Stm_Platform.h"
+
+int8_t isl28023_read_ID(struct isl28023_dev_s *self, uint8_t *buf);
+
+void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr)
+{
+    self->i2c_dev = i2c_dev;
+	self->read_ID = &isl28023_read_ID;
+	self->hw_adr = hw_adr;
+}
+
+int8_t isl28023_read_ID(struct isl28023_dev_s *self, uint8_t *buf)
+{
+	//hw_adr = 0b10001010	
+  	HAL_StatusTypeDef result;
+	// result = HAL_I2C_Mem_Read(self->i2c_dev->hi2c, self->hw_adr,
+	// 						  ISL28023_REG_IC_DEVICE_ID, I2C_MEMADD_SIZE_8BIT,
+	// 						  buf, 9, HAL_MAX_DELAY);
+	return self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
+								   ISL28023_REG_IC_DEVICE_ID, I2C_MEMADD_SIZE_8BIT, buf, 9, HAL_MAX_DELAY);
+}
+
 
 WS_DPM WsDpm;
 
