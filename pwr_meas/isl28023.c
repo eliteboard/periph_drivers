@@ -16,25 +16,34 @@
 #include "i2c_hal.h"
 
 int8_t isl28023_read_ID(struct isl28023_dev_s *self, uint8_t *buf);
+int8_t isl28023_read_vshunt(struct isl28023_dev_s *self, float_t *data);
 
 void isl28023_init(struct isl28023_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr)
 {
     self->i2c_dev = i2c_dev;
 	self->read_ID = &isl28023_read_ID;
+	self->read_vshunt = &isl28023_read_vshunt;
 	self->hw_adr = hw_adr;
 }
 
 int8_t isl28023_read_ID(struct isl28023_dev_s *self, uint8_t *buf)
 {
-	//hw_adr = 0b10001010	
-  	HAL_StatusTypeDef result;
-	// result = HAL_I2C_Mem_Read(self->i2c_dev->hi2c, self->hw_adr,
-	// 						  ISL28023_REG_IC_DEVICE_ID, I2C_MEMADD_SIZE_8BIT,
-	// 						  buf, 9, HAL_MAX_DELAY);
 	return self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
 								   ISL28023_REG_IC_DEVICE_ID, I2C_MEMADD_SIZE_8BIT, buf, 9, HAL_MAX_DELAY);
 }
 
+int8_t isl28023_read_vshunt(struct isl28023_dev_s *self, float_t *data)
+{
+	// datasheet p. 35
+	uint8_t buf[3];
+	int8_t result = self->i2c_dev->mem_read(self->i2c_dev, self->hw_adr,
+								   ISL28023_REG_READ_VSHUNT_OUT, I2C_MEMADD_SIZE_8BIT, &buf[0], 3, HAL_MAX_DELAY);
+	float_t vshunt_lsb = 2.5e-6; //2.5uV
+	int16_t sign = (buf[1] & 0b10000000)>>7;
+	int16_t reg_val = ((buf[1] & 0b01111111)<<8) + buf[2] - (sign*(1<<15));
+	*data = reg_val * vshunt_lsb;
+	return result;
+}
 
 WS_DPM WsDpm;
 
