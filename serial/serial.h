@@ -1,3 +1,6 @@
+#ifndef __SERIAL_DRV_H__
+#define __SERIAL_DRV_H__
+
 #define EOL "\r\n"
 
 struct serial_dev_s {
@@ -18,3 +21,5 @@ struct serial_dev_s {
 };
 
 void serial_dev_default_init(struct serial_dev_s* s);
+
+#endif
