@@ -1,10 +1,15 @@
 #ifndef __SERIAL_DRV_H__
 #define __SERIAL_DRV_H__
 
+#include <stdint.h>
+
 #define EOL "\r\n"
 
 struct serial_dev_s {
-    void* hwHandle;
+    uint16_t temporary_buffer;
+    void* rxbuffer;
+    void* txbuffer;
+    void* handle;
     //// implement basic methods for specific hardware
     void (*init)(struct serial_dev_s* s);
     void (*deinit)(struct serial_dev_s* s);
