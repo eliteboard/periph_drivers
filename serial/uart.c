@@ -1,11 +1,5 @@
 #include "uart.h"
 
-// char globrxbuff;
-// char globtxbuff;
-
-// struct serial_dev_s* global_inst = 0;
-
-
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
     struct serial_dev_s* inst = (struct serial_dev_s*)(huart->pRxBuffPtr);
     if(rb_get((struct rb_handle_s*)inst->txbuffer, (char*)&inst->temporary_buffer)){
