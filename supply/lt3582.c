@@ -3,10 +3,17 @@
 #include <errno.h>
 #include <math.h>
 
+void lt3582_init(struct lt3582_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr)
+{
+    self->i2c_dev = i2c_dev;
+    self->setVoltages = &lt3582_setVoltages;
+    self->hw_adr = hw_adr;
+}
+
 int8_t lt3582_writeReg(struct lt3582_dev_s *self, uint8_t adr, uint8_t val)
 {
     int8_t result;
-    result = self->i2c_dev->i2c_mem_write(self->i2c_dev, self->hw_adr, adr, 1, &val, 1, 0xFFFFFFFF);    
+    result = self->i2c_dev->mem_write(self->i2c_dev, self->hw_adr, adr, 1, &val, 1, 0xFFFFFFFF);    
     return result;
 }
 

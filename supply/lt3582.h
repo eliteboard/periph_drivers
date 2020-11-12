@@ -33,19 +33,18 @@
 struct lt3582_dev_s
 {
     struct i2c_dev_s *i2c_dev; /**< I2C device */
+    int8_t (*setVoltages) (struct lt3582_dev_s *self, float_t volt_p, float_t volt_n);
     uint8_t hw_adr; /**< hardware address of chip */
     uint8_t reg0; /**< VOUTP Output Voltage (00h=3.2V, BFh = 12.75V) */
     uint8_t reg1; /**< VOUTN Output Voltage (00h=1.2V, FFh = 13.95V) */
     uint8_t reg2; /**< Lockout bit, 25mV increase Voutp, RAMP pull-up current, power down discharge EN, power up sequencing */
     uint8_t cmdr; /**< write OTP, clr/progr fault, RST, switches off, REG select (OTP or REG) */
-
-    // TODO: Add function pointers
 };
 
 int8_t lt3582_writeReg(struct lt3582_dev_s *self, uint8_t adr, uint8_t val);
 int8_t lt3582_readReg(struct lt3582_dev_s *self, uint8_t adr, uint8_t val);
 
 int8_t lt3582_setVoltages(struct lt3582_dev_s *self, float_t volt_p, float_t volt_n);
-int8_t lt3582_init(struct lt3582_dev_s *self);
+void lt3582_init(struct lt3582_dev_s *self, struct i2c_dev_s *i2c_dev, uint8_t hw_adr);
 
 #endif
