@@ -108,7 +108,21 @@ struct wm8731_dev_s
     struct i2c_dev_s *i2c_dev; /**< I2C device */
     SAI_HandleTypeDef *sai_dev_dac;
     SAI_HandleTypeDef *sai_dev_adc;
-    //struct sai_dev_s *sai_dev; /**< SAI device */
+    int8_t (*reset) (struct wm8731_dev_s *self);
+    int8_t (*disable_power_down) (struct wm8731_dev_s *self);
+    int8_t (*set_interface_format) (struct wm8731_dev_s *self);
+    int8_t (*set_sampling_rate) (struct wm8731_dev_s *self, enum wm8731_sr sr);
+    int8_t (*conf_linein) (struct wm8731_dev_s *self, float_t volume_db);
+    int8_t (*activate) (struct wm8731_dev_s *self);
+    int8_t (*init) (struct wm8731_dev_s *self, enum wm8731_sr sr);
+
+    void (*waitOutBuf) (struct wm8731_dev_s *self);
+    void (*waitInBuf) (struct wm8731_dev_s *self);
+    void (*startDacDma) (struct wm8731_dev_s *self);
+    void (*startAdcDma) (struct wm8731_dev_s *self);
+    void (*putOutBuf) (struct wm8731_dev_s *self, int16_t *data);
+    void (*getInBuf) (struct wm8731_dev_s *self, int16_t *data);
+
     uint8_t hw_adr; /**< hardware address of chip */
     uint16_t reg[16]; /**<  */
 };
