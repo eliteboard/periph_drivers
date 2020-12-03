@@ -4,6 +4,14 @@
 #include "stm32h7xx_hal.h"
 #include "i2c_hal.h"
 
+void i2c_init(struct i2c_dev_s *self, I2C_HandleTypeDef *hi2c)
+{
+    self->hi2c = hi2c;
+    self->mem_read = &i2c_mem_read;
+    self->mem_write = &i2c_mem_write;
+    self->master_transmit = &i2c_master_transmit;
+}
+
 int8_t i2c_mem_read(struct i2c_dev_s *self, uint16_t DevAddress,
                             uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {    
