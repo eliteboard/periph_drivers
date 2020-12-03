@@ -103,6 +103,8 @@
 DMA_BUFFER static int16_t wm8731_dacBuf[WM8731_DAC_BUF_LEN];
 DMA_BUFFER static int16_t wm8731_adcBuf[WM8731_ADC_BUF_LEN];
 
+enum wm8731_sr {ADC48_DAC48,  ADC8_DAC8};
+
 struct wm8731_dev_s
 {
     struct i2c_dev_s *i2c_dev; /**< I2C device */
@@ -114,7 +116,7 @@ struct wm8731_dev_s
     int8_t (*set_sampling_rate) (struct wm8731_dev_s *self, enum wm8731_sr sr);
     int8_t (*conf_linein) (struct wm8731_dev_s *self, float_t volume_db);
     int8_t (*activate) (struct wm8731_dev_s *self);
-    int8_t (*init) (struct wm8731_dev_s *self, enum wm8731_sr sr);
+    int8_t (*setup) (struct wm8731_dev_s *self, enum wm8731_sr sr);
 
     void (*waitOutBuf) (struct wm8731_dev_s *self);
     void (*waitInBuf) (struct wm8731_dev_s *self);
@@ -127,7 +129,8 @@ struct wm8731_dev_s
     uint16_t reg[16]; /**<  */
 };
 
-enum wm8731_sr {ADC48_DAC48,  ADC8_DAC8};
+void wm8731_init(struct wm8731_dev_s *self, struct i2c_dev_s *i2c_dev,
+                 SAI_HandleTypeDef *sai_dev_dac, SAI_HandleTypeDef *sai_dev_adc, uint8_t hw_adr);
 
 int8_t wm8731_writeReg(struct wm8731_dev_s *self, uint8_t adr, uint16_t val);
 //int8_t wm8731_readReg(struct lt3582_dev_s *self, uint8_t adr, uint8_t &val);
@@ -138,7 +141,7 @@ int8_t wm8731_set_interface_format(struct wm8731_dev_s *self);
 int8_t wm8731_set_sampling_rate(struct wm8731_dev_s *self, enum wm8731_sr sr);
 int8_t wm8731_conf_linein(struct wm8731_dev_s *self, float_t volume_db);
 int8_t wm8731_activate(struct wm8731_dev_s *self);
-int8_t wm8731_init(struct wm8731_dev_s *self, enum wm8731_sr sr);
+int8_t wm8731_setup(struct wm8731_dev_s *self, enum wm8731_sr sr);
 
 void wm8731_waitOutBuf(struct wm8731_dev_s *self);
 void wm8731_waitInBuf(struct wm8731_dev_s *self);

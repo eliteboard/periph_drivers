@@ -34,6 +34,30 @@ void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef *hsai)
     wm8731_inBufAvail=1;
 }
 
+void wm8731_init(struct wm8731_dev_s *self, struct i2c_dev_s *i2c_dev,
+                 SAI_HandleTypeDef *sai_dev_dac, SAI_HandleTypeDef *sai_dev_adc, uint8_t hw_adr)
+{
+    self->hw_adr = hw_adr;
+    self->sai_dev_adc = sai_dev_adc;
+    self->sai_dev_dac = sai_dev_dac;
+    self->i2c_dev = i2c_dev;
+    self->reset = &wm8731_reset;
+    self->disable_power_down = &wm8731_disable_power_down;
+    self->set_interface_format = &wm8731_set_interface_format;
+    self->set_sampling_rate = &wm8731_set_sampling_rate;
+    self->conf_linein = &wm8731_conf_linein;
+    self->activate = &wm8731_activate;
+    self->setup = &wm8731_setup;
+
+    self->waitOutBuf = &wm8731_waitOutBuf;
+    self->waitInBuf = &wm8731_waitInBuf;
+    self->startDacDma = &wm8731_startDacDma;
+    self->startAdcDma = &wm8731_startAdcDma;
+    self->putOutBuf = &wm8731_putOutBuf;
+    self->getInBuf = &wm8731_getInBuf;
+}
+
+
 void wm8731_waitOutBuf(struct wm8731_dev_s *self)
 {
     while(!wm8731_outBufAvail)
@@ -287,7 +311,7 @@ int8_t wm8731_activate(struct wm8731_dev_s *self)
     }
 }
 
-int8_t wm8731_init(struct wm8731_dev_s *self, enum wm8731_sr sr)
+int8_t wm8731_setup(struct wm8731_dev_s *self, enum wm8731_sr sr)
 {
     int8_t error=0;
     error+=wm8731_reset(self);
