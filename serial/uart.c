@@ -1,3 +1,9 @@
+// Copyright 2019-2021, Philipp Peterseil,
+// Institute for Communications Engineering and RF-Systems,
+// Johannes Kepler University Linz, Austria and all contributors
+// SPDX-License-Identifier: MIT
+
+
 #include "uart.h"
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){

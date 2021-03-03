@@ -1,3 +1,8 @@
+// Copyright 2019-2021, Reinhard Feger,
+// Institute for Communications Engineering and RF-Systems,
+// Johannes Kepler University Linz, Austria and all contributors
+// SPDX-License-Identifier: MIT
+
 /* Driver for Timer based on HAL functions */
 #ifndef TIM_HAL_H
 #define TIM_HAL_H

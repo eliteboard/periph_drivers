@@ -1,3 +1,8 @@
+// Copyright 2019-2021, Philipp Peterseil,
+// Institute for Communications Engineering and RF-Systems,
+// Johannes Kepler University Linz, Austria and all contributors
+// SPDX-License-Identifier: MIT
+
 #include "rb.h"
 
 struct rb_handle_s rb_init(char* mem, uint16_t size){
